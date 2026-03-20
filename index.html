@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <script>
+        // 1. 在這裡設定你的專屬密碼 (例如設定為 "2026")
+        var myPassword = "20260327"; 
+
+        // 2. 網頁一打開，就跳出輸入框要求輸入密碼
+        var userInput = prompt("這是一個私密測試網頁，請輸入通關密碼：");
+
+        // 3. 判斷密碼對不對
+        if (userInput !== myPassword) {
+            // 如果輸入錯誤，或是按了取消
+            alert("密碼錯誤！你將被踢出此網頁。");
+            // 直接把他強制導向到一個空白網頁 (或者你也可以改成 Google 首頁)
+            window.location.href = "about:blank"; 
+        }
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>將來銀行 NEXT BANK 活動頁</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <style>
+/* =========================================
+           1. 基礎設定與變數
+        ========================================= */
+        :root {
+            --primary-yellow: #FFEA00;
+            --bg-light: #F4F5F7;
+            --text-dark: #222222;
+            --text-gray: #666666;
+            --white: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* =========================================
+           2. 動畫核心設定 (Reveal)
+        ========================================= */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            /* 這是進場的滑動動畫 (0.8秒) */
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.215, 0.61, 0.355, 1);
+            will-change: transform, opacity;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 階梯式延遲：讓卡片有順序地出現 */
+        .grid-2 > .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .grid-3 > .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .grid-3 > .reveal:nth-child(3) { transition-delay: 0.4s; }
+
+        /* =========================================
+           3. 網頁版面與 Header
+        ========================================= */
+        .wrapper-full { width: 100%; margin: 0 auto; background-color: var(--bg-light); overflow: hidden; position: relative; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; width: 100%; }
+
+header { 
+    background-color: #000000; /* 👈 關鍵：換成黑色底 */
+    height: 80px; 
+    width: 100%; 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
+}
+        .header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; }
+        .logo img { max-height: 36px; width: auto; }
+.btn-header { 
+    background-color: #FFFFFF; /* 👈 關鍵：換成白底 */
+    color: #000000;            /* 👈 關鍵：換成黑字 */
+    border: none; 
+    padding: 8px 24px; 
+    border-radius: 20px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    font-size: 16px; 
+    transition: all 0.3s ease; /* 讓 hover 效果順暢一點 */
+}
+
+.btn-header:hover {
+    background-color: var(--primary-yellow); /* 滑過去變將來黃 */
+    color: #000000;
+}
+
+        .hero-banner-wrapper {
+    width: 100%;
+    /* 👇 加上這三行來設定底圖 👇 */
+    background-image: url('images/bg.png'); /* 放你想要的底圖 */
+    background-size: cover;                  /* 讓底圖填滿整個區塊 */
+    background-position: center;             /* 底圖置中 */
+    
+    display: flex;               
+    justify-content: center;     
+    align-items: center;
+    overflow: hidden;
+}
+        .hero-banner-wrapper picture { display: block; width: 100%; max-width: 1440px; }
+        .hero-banner-wrapper img { width: 100%; height: auto; display: block; }
+
+/* 1. 為圖片容器設定相對定位，做為標籤的定位基準 */
+        .loan-img-placeholder {
+            position: relative;
+        }
+
+        /* 2. 設定標籤的絕對定位和樣式 */
+        .loan-tag {
+            position: absolute;   /* 關鍵：設定為絕對定位 */
+            top: 15px;             /* 距離圖片頂部 8px */
+            left: 15px;            /* 距離圖片左側 8px */
+            background-color: var(--primary-yellow); /* 黃色背景 */
+            color: var(--text-dark); /* 深色文字 */
+            border-radius: 40px;      /* 圓角 */
+            padding: 3px 10px;        /* 內距，調整標籤大小 */
+            font-size: 16px;          /* 字體大小，調整得精緻一點 */
+            font-weight: bold;        /* 粗體 */
+            z-index: 5;               /* 確保標籤在圖片之上，不被覆蓋 */
+            white-space: nowrap;      /* 防止文字斷行 */
+            margin-bottom: 0;         /* 覆蓋之前的 margin */
+        }
+
+/* 讓內部容器可以作為絕對定位的基準 */
+        .banner-inner {
+            position: relative;
+            width: 100%;
+            max-width: 1440px;
+        }
+
+        /* 控制三顆按鈕的群組位置 */
+        .banner-anchor-btns {
+            position: absolute;
+            bottom: 6%;       /* 👈 關鍵：控制按鈕上下的位置，視你的圖片比例調整 (例如 10% 或 15%) */
+            left: 50%;
+            transform: translateX(-50%); /* 讓整組按鈕水平置中 */
+            display: flex;
+            gap: 12px;         /* 按鈕之間的間距 */
+            z-index: 10;
+        }
+
+        /* 畫出黑底白框的按鈕 */
+        .banner-anchor-btns a {
+            background-color: #000000;
+            color: #FFFFFF !important;
+            text-decoration: none !important;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        /* 加上滑鼠懸浮效果 (會變成將來黃) */
+        .banner-anchor-btns a:hover {
+            background-color: var(--primary-yellow);
+            color: #000000 !important;
+            border-color: #000000;
+            transform: translateY(-3px);
+        }
+
+        /* 手機版微調 */
+        @media (max-width: 1024px) {
+            .banner-anchor-btns {
+                bottom: 10%;       /* 👈 根據你的平板圖 (MID.png) 微調高度 */
+                width: 90%;        /* 讓按鈕組佔據畫面 90% */
+                max-width: 700px;  /* 限制最大寬度，才不會拉得太長 */
+                gap: 12px;         /* 平板空間還夠，間距可以保留 */
+            }
+
+            .banner-anchor-btns a {
+                flex: 1;           /* 讓三顆按鈕平均拉寬 */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px 15px; 
+                font-size: 14px;   /* 平板字體稍微縮小一點 */
+                white-space: nowrap !important; /* 絕對不准斷行 */
+                word-break: keep-all !important;
+            }
+        }
+
+/* =========================================
+           輪播圖專區 (含電腦版箭頭與手機滑動設定)
+        ========================================= */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            padding: 0 50px; /* 電腦版左右留白給箭頭 */
+        }
+
+        .carousel-wrapper {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth; /* 👈 點擊箭頭滑順移動的關鍵 */
+            
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .carousel-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .carousel-wrapper .card-vertical {
+            flex: 0 0 calc(33.333% - 14px); /* 電腦版一次顯示 3 張 */
+            scroll-snap-align: start;
+        }
+
+        /* 👑 電腦版左右箭頭樣式 */
+        .carousel-arrow {
+            position: absolute;
+            top: 45%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            background-color: #FFFFFF;
+            color: #222;
+            border: 1px solid #E2E8F0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .carousel-arrow:hover {
+            background-color: var(--primary-yellow);
+            border-color: var(--primary-yellow);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .prev-arrow { left: 0; }
+        .next-arrow { right: 0; }
+
+
+        /* =========================================
+           尺寸 2：平板版微調 (螢幕寬度 1024px 以下)
+        ========================================= */
+        @media (max-width: 1024px) {
+            .carousel-container { padding: 0; } /* 取消留白 */
+            .carousel-arrow { display: none; }  /* 👈 隱藏箭頭，改用手滑 */
+            
+            .carousel-wrapper .card-vertical {
+                flex: 0 0 calc(45% - 10px);    
+            }
+        }
+
+
+        /* =========================================
+           尺寸 3：手機版專屬 (螢幕寬度 768px 以下觸發)
+        ========================================= */
+        @media (max-width: 768px) {
+            .banner-anchor-btns {
+                bottom: 8%;        
+                width: 96%;        
+                max-width: none;   
+                gap: 6px;          
+            }
+
+            .banner-anchor-btns a {
+                padding: 8px 4px;  
+                font-size: 13px !important; 
+                letter-spacing: -0.5px;     
+            }
+
+            /* 手機版大卡片置中滑動 */
+            .carousel-wrapper .card-vertical {
+                flex: 0 0 82%;              
+                scroll-snap-align: center;  
+            }
+        }
+
+        /* =========================================
+           4. 標題與標籤樣式
+        ========================================= */
+        .section-container { padding-top: 60px; padding-bottom: 60px; text-align: center; }
+        .section-header { margin-bottom: 40px; }
+        .section-title { font-size: 22px; font-weight: bold; margin-top: 8px; }
+
+        .title-pill-large { display: inline-block; padding: 10px 48px; border-radius: 60px; font-weight: 900; font-size: 26px; margin-bottom: 24px; letter-spacing: 2px; }
+        .title-pill-large.yellow { background-color: var(--primary-yellow); color: var(--text-dark); }
+        .title-pill-large.white { background-color: var(--white); color: var(--text-dark); }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 40px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+        /* =========================================
+           5. 卡片通用設定 (包含橫向與垂直)
+        ========================================= */
+        /* 讓 <a> 標籤支援排版與動畫，並移除底線顏色 */
+        .card-horizontal, .loan-card, .card-vertical {
+            display: flex;
+            text-decoration: none !important;
+            color: inherit !important;
+            background-color: var(--white);
+            border: 1px solid #e5e7eb; /* 淡淡的邊框代替陰影 */
+            box-shadow: none;
+            overflow: hidden;
+        }
+
+        /* 只有當卡片已經滑出來(active)之後，滑鼠移上去才會有懸浮動畫 */
+        .reveal.active:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary-yellow);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+	.card-image-box img {
+  /* 👈 確保這行存在 */
+  width: 100%;   /* 或你設定的固定寬度 */
+  height: 100%;  /* 或你設定的固定高度 */
+
+  /* 👈 這行最重要 */
+  object-fit: cover;
+}
+
+        /* =========================================
+           6. 橫向卡片專區 (金幣區)
+        ========================================= */
+        .card-horizontal {
+            border-radius: 45px;
+            padding: 24px 30px;
+            align-items: center; 
+            gap: 15px;
+            text-align: left;
+        }
+       .card-horiz-img { 
+    width: 100px;  /* 👈 盒子變寬 */
+    height: 100px; /* 👈 盒子變高 */
+    flex-shrink: 0; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+.card-horiz-img img { 
+    width: 100%;  /* 👈 讓圖片完全填滿這個 100px 的盒子 */
+    height: auto; 
+    display: block; 
+    object-fit: contain; /* 確保圖片完整顯示不變形 */
+}
+        
+        .card-horiz-content { flex: 1; display: flex; flex-direction: column; align-items: flex-start; padding-left: 10px; }
+        
+        .pill-yellow { 
+            background-color: var(--primary-yellow); color: var(--text-dark); 
+            border-radius: 40px; font-weight: bold; 
+            padding: 6px 20px; font-size: 18px; 
+            margin-bottom: 4px; white-space: nowrap; 
+        }
+
+
+	.pill-with-date {
+            display: flex;
+            align-items: center; /* 確保標籤跟日期上下對齊 */
+            gap: 12px;           /* 標籤跟日期之間的距離，可以自由調整 */
+            margin-bottom: 4px;  /* 保持跟下方大標題的距離 */
+        }
+
+        /* 日期文字的專屬樣式 */
+        .date-text {
+            font-size: 16px;            /* 日期字體稍微小一點比較精緻 */
+            color: var(--text-gray);    /* 用你原本設定好的質感灰色 */
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* 讓橫向卡片的黃色標籤往左對齊 */
+        .card-horizontal .pill-yellow { margin-left: -20px; }
+        
+        .card-desc { font-size: 16px; font-weight: bold; color: var(--text-dark); }
+        .arrow-icon { background-color: var(--primary-yellow); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-dark); }
+        .arrow-icon .material-symbols-outlined { font-size: 24px; font-variation-settings: 'FILL' 0, 'wght' 700, 'GRAD' 0, 'opsz' 24; }
+
+        /* =========================================
+           7. 垂直卡片專區 (信貸 & 下方三格)
+        ========================================= */
+.card-vertical, .loan-card {
+            flex-direction: column; /* 確保圖片在上、文字在下 */
+            border-radius: 30px;
+            height: 100%;
+        }
+
+.card-vert-img-box, .loan-img-placeholder {
+            width: 100%; 
+            height: auto; /* 👈 關鍵 1：解除高度限制，讓它隨圖片比例長高 */
+            overflow: hidden; 
+            background-color: #E2E8F0; 
+            display: block;
+        }
+
+.card-vert-img-box img, .loan-img-placeholder img {
+            width: 100%; 
+            height: auto; /* 👈 關鍵 2：等比例縮放，保證字跟人臉絕對不變形！ */
+            display: block;
+        }
+
+.card-vertical-content, .loan-text-wrap { 
+            padding: 25px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; flex-grow: 1; 
+        }
+.card-vertical-content p, .loan-text-wrap p { 
+            margin-top: 16px; font-size: 16px; color: var(--text-gray); font-weight: bold; line-height: 1.5; text-align: left; 
+        }
+
+/* 讓 Footer 左邊的存保 Logo 乖乖待在格子裡 */
+.cdic-logo-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 👈 關鍵：讓 Logo 完整縮放顯示，不變形也不被裁切 */
+    display: block;
+}
+
+/* 讓 Footer 右邊的社群 Icon 乖乖待在格子裡 */
+.social-icon-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+    display: block;
+}
+
+.cdic-logo-placeholder { 
+    width: 40px; 
+    height: auto; 
+    background-color: transparent; /* 👈 關鍵：把白底改成透明 */
+    display: flex;                 /* 👈 改成 flex 讓它對齊更漂亮 */
+    align-items: center;
+}
+
+        /* =========================================
+           8. 貸款專區 (漸層背景與浮水印)
+        ========================================= */
+        .loan-wrapper {
+            position: relative;
+            background: linear-gradient(to bottom, #faec32 0%, #fff792 100%);
+            border-radius: 60px; padding: 50px 40px 30px; margin: 60px 0; overflow: hidden; z-index: 1;
+        }
+        .loan-wrapper::before {
+            content: ''; position: absolute; bottom: -30px; right: -20px; width: 700px; height: 700px;
+            background-image: url('images/LOGO.png'); background-size: contain; background-repeat: no-repeat;
+            opacity: 0.15; z-index: -1; pointer-events: none;
+        }
+
+        /* =========================================
+           9. Footer & 響應式設計 (RWD)
+        ========================================= */
+        .site-footer { background-color: #222222; color: #FFFFFF; padding: 60px 0; margin-top: 60px; font-size: 14px; }
+        .footer-top { text-align: center; color: #cccccc; margin-bottom: 50px; }
+        .footer-bottom { display: flex; justify-content: space-between; align-items: flex-start; }
+        .footer-left { display: flex; flex-direction: column; gap: 24px; }
+        .cdic-info { display: flex; align-items: center; gap: 16px; font-size: 20px; }
+        
+        .warning-text { font-size: 28px; font-weight: 900; letter-spacing: 4px; }
+        .footer-right { text-align: left; color: #cccccc; line-height: 1.8; }
+        .social-icons { display: flex; gap: 16px; margin-top: 16px; }
+        .social-icon-placeholder { width: 24px; height: 24px; border: 1px solid #ccc; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+
+        @media (max-width: 992px) {
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .title-pill-large { font-size: 20px; padding: 10px 24px; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 40px; align-items: center; text-align: center; }
+            .footer-left, .footer-right { align-items: center; text-align: center; }
+            .card-horiz-img { width: 70px; }
+            .social-icons { justify-content: center; }
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="wrapper-full">
+    <header>
+        <div class="container header-inner">
+            <div class="logo"><img src="images/將來銀行.png" alt="Logo"></div>
+            <button class="btn-header">加入將來</button>
+        </div>
+    </header>
+
+<div class="hero-banner-wrapper">
+        <div class="banner-inner">
+            <picture>
+                <source media="(max-width: 768px)" srcset="images/MB.png">
+                
+                <source media="(max-width: 1024px)" srcset="images/MID.png">
+                
+                <img src="images/C.png" alt="主視覺">
+            </picture>
+
+            <div class="banner-anchor-btns">
+			<a href="#section-1">預存實利&nbsp;▼</a>
+			<a href="#section-2">自由跨界&nbsp;▼</a>
+			<a href="#section-3">輕鬆起跑&nbsp;▼</a>
+			<a href="#section-4">將來速貸&nbsp;▼</a>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <div id="section-1" class="container section-container">
+            
+            <div class="section-header">
+                <div class="title-pill-large yellow">預存實利 對的時機加倍給力</div>
+                <h2 class="section-title">你勇敢的第一步 ，讓我們在將來裡相約 將來見 </h2>
+            </div>
+            <div class="grid-2">
+<a href="你的活動連結" class="card-horizontal reveal">
+    <div class="card-horiz-img"><img src="images/口袋.png" alt="錢"></div>
+   <div class="card-horiz-content">
+        <div class="pill-with-date">
+            <span class="pill pill-yellow">戴你發</span>
+            <span class="date-text">3/27-4/15</span>
+        </div>
+        <p class="card-desc">存起來！口袋帳戶<br>存16888，利率最高8% </p>
+    </div>
+    <div class="arrow-icon"><span class="material-symbols-outlined">chevron_right</span></div>
+</a>
+<a href="你的活動連結" class="card-horizontal reveal">
+    <div class="card-horiz-img"><img src="images/VISA.png" alt="錢"></div>
+   <div class="card-horiz-content">
+        <div class="pill-with-date">
+            <span class="pill pill-yellow">戴你飛</span>
+            <span class="date-text">3/27-4/20</span>
+        </div>
+        <p class="card-desc">飛起來！消費滿額抽<br>FIFA世足美國洛杉磯雙人遊</p>
+    </div>
+
+    <div class="arrow-icon"><span class="material-symbols-outlined">chevron_right</span></div>
+</a>
+            </div>
+
+            <div class="grid-2">
+                <a href="你的活動連結" class="card-horizontal reveal">
+    <div class="card-horiz-img"><img src="images/行李箱.png" alt="錢"></div>
+    <div class="card-horiz-content">
+        <div class="pill-with-date">
+            <span class="pill pill-yellow">新戶享</span>
+            <span class="date-text">4/1-6/30</span>
+        </div>
+        <p class="card-desc">當月刷卡消費任5筆<br>或滿額，行李箱4選1 </p>
+    </div>
+    <div class="arrow-icon"><span class="material-symbols-outlined">chevron_right</span></div>
+</a>
+                <a href="你的活動連結" class="card-horizontal reveal">
+    <div class="card-horiz-img"><img src="images/打勾.png" alt="錢"></div>
+   <div class="card-horiz-content">
+        <div class="pill-with-date">
+            <span class="pill pill-yellow">新戶領</span>
+            <span class="date-text">4/1-6/30</span>
+        </div>
+        <p class="card-desc">打勾加開信託戶<br>成為財管會員最高領$400</p>
+    </div>
+    <div class="arrow-icon"><span class="material-symbols-outlined">chevron_right</span></div>
+</a>
+            </div>
+
+            <div class="grid-2">
+               <a href="你的活動連結" class="card-horizontal reveal">
+    <div class="card-horiz-img"><img src="images/200.png" alt="錢"></div>
+   <div class="card-horiz-content">
+        <div class="pill-with-date">
+            <span class="pill pill-yellow">老朋友</span>
+            <span class="date-text">3/18-6/30</span>
+        </div>
+        <p class="card-desc">開通外幣帳戶＋換匯一筆<br>200元小確幸 </p>
+    </div>
+    <div class="arrow-icon"><span class="material-symbols-outlined">chevron_right</span></div>
+</a>
+                <a href="你的活動連結" class="card-horizontal reveal">
+    <div class="card-horiz-img"><img src="images/招財貓.png" alt="錢"></div>
+    <div class="card-horiz-content">
+        <div class="pill-with-date">
+            <span class="pill pill-yellow">財神到</span>
+            <span class="date-text">4/1-6/30</span>
+        </div>
+        <p class="card-desc">完成任務，5-20萬利率2%<br>超過20萬1.6％無上限</p>
+    </div>
+    <div class="arrow-icon"><span class="material-symbols-outlined">chevron_right</span></div>
+</a>
+            </div>
+
+
+            <div id="section-2" class="loan-wrapper reveal">
+                <div class="section-header">
+                    <div class="title-pill-large white">自由跨界  隨心所欲才能攻守兼備</div>
+                    <h2 class="section-title" style="color:#222">跨出無所畏懼第一步，主動開創屬於我的將來</h2>
+                </div>
+          <div class="grid-2">
+	<a href="你的信貸連結網址" class="loan-card reveal">
+        <div class="loan-img-placeholder">
+            <span class="loan-tag">出門花</span>
+            <img src="images/A.png" alt="小額信貸">
+        </div>
+        <div class="loan-text-wrap">
+            <p>美金、日圓手續費挑戰市場最優價<br>美金匯出手續費首筆0元！</p>
+        </div>
+        </a>
+
+   <a href="你的信貸連結網址" class="loan-card reveal">
+        <div class="loan-img-placeholder">
+            <span class="loan-tag">出門保</span>
+            <img src="images/A.png" alt="小額信貸">
+        </div>
+        <div class="loan-text-wrap">
+            <p>＃Team將來，將將保費滿500百</br>季抽機車、月月抽曼谷/福岡/釜山機票！</p>
+        </div>
+        </a>
+
+<a href="你的信貸連結網址" class="loan-card reveal">
+        <div class="loan-img-placeholder">
+            <span class="loan-tag">免出門</span>
+            <img src="images/A.png" alt="小額信貸">
+        </div>
+        <div class="loan-text-wrap">
+            <p>創新速匯，讓你海外資金返台</br>2天到帳！再享0元手續費</p>
+        </div>
+        </a>
+
+<a href="你的信貸連結網址" class="loan-card reveal">
+        <div class="loan-img-placeholder">
+            <span class="loan-tag">在家存</span>
+            <img src="images/A.png" alt="小額信貸">
+        </div>
+        <div class="loan-text-wrap">
+            <p>存入新資金，享美金定存年利率4%</br>存滿利息超過新台幣9萬元</p>
+        </div>
+        </a>
+
+</div>
+            </div>
+
+        <div id="section-3" class="section-header" style="margin-top: 40px;">
+                <div class="title-pill-large yellow">輕鬆起跑  跟著將來站穩遠眺</div>
+                <h2 class="section-title">你出手的瞬間，是將來從此不凡的瞬間</h2>
+            </div>
+            
+            <div class="carousel-container reveal">
+                <button class="carousel-arrow prev-arrow"><span class="material-symbols-outlined">chevron_left</span></button>
+                
+                <div class="carousel-wrapper">
+                    <a href="連結網址1" class="card-vertical">
+                        <div class="card-vert-img-box"><img src="images/A.png" alt="img"></div>
+                        <div class="card-vertical-content">
+                            <span class="pill pill-yellow" style="margin-left:0;">放眼將來</span>
+                            <p>熱門美股ETF APP一擊申購！<br>筆數無上限，手續費只要99元</p>
+                        </div>
+                    </a>
+                    
+                    <a href="連結網址2" class="card-vertical">
+                        <div class="card-vert-img-box"><img src="images/A.png" alt="img"></div>
+                        <div class="card-vertical-content">
+                            <span class="pill pill-yellow" style="margin-left:0;">世界百大0距離</span>
+                            <p>全球主流標的，不用千元<br>就能啟動夢想，穩健投資</p>
+                        </div>
+                    </a>
+
+                    <a href="連結網址3" class="card-vertical">
+                        <div class="card-vert-img-box"><img src="images/A.png" alt="img"></div>
+                        <div class="card-vertical-content">
+                            <span class="pill pill-yellow" style="margin-left:0;">利潤完整留存</span>
+                            <p>業界最大差異<br>信管費就是不收！</p>
+                        </div>
+                    </a>
+                </div>
+
+                <button class="carousel-arrow next-arrow"><span class="material-symbols-outlined">chevron_right</span></button>
+            </div>
+
+
+            <div id="section-4" class="section-header" style="margin-top: 60px;">
+                <div class="title-pill-large yellow">將來速貸 支持你的美好將來</div>
+                <h2 class="section-title">更多精選優惠，探索無限可能</h2>
+            </div>
+            
+            <div class="carousel-container reveal">
+                <button class="carousel-arrow prev-arrow"><span class="material-symbols-outlined">chevron_left</span></button>
+                
+                <div class="carousel-wrapper">
+                    <a href="連結網址1" class="card-vertical">
+                        <div class="card-vert-img-box"><img src="images/A.png" alt="img"></div>
+                        <div class="card-vertical-content">
+                            <span class="pill pill-yellow" style="margin-left:0;">信用貸款</span>
+                            <p>支持夢想</p>
+                        </div>
+                    </a>
+                    
+                    <a href="連結網址2" class="card-vertical">
+                        <div class="card-vert-img-box"><img src="images/A.png" alt="img"></div>
+                        <div class="card-vertical-content">
+                            <span class="pill pill-yellow" style="margin-left:0;">MGM</span>
+                            <p>我還沒拿到方案</p>
+                        </div>
+                    </a>
+
+                    <a href="連結網址3" class="card-vertical">
+                        <div class="card-vert-img-box"><img src="images/A.png" alt="img"></div>
+                        <div class="card-vertical-content">
+                            <span class="pill pill-yellow" style="margin-left:0;">利潤完整留存</span>
+                            <p>業界最大差異<br>信管費就是不收！</p>
+                        </div>
+                    </a>
+                    
+                    <a href="連結網址4" class="card-vertical">
+                        <div class="card-vert-img-box"><img src="images/A.png" alt="img"></div>
+                        <div class="card-vertical-content">
+                            <span class="pill pill-yellow" style="margin-left:0;">利潤完整留存</span>
+                            <p>業界最大差異<br>信管費就是不收！</p>
+                        </div>
+                    </a>
+                </div>
+
+                <button class="carousel-arrow next-arrow"><span class="material-symbols-outlined">chevron_right</span></button>
+            </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-top">將來銀行主要股東為 中華電信、兆豐銀行、全聯實業</div>
+            <div class="footer-bottom">
+                <div class="footer-left">
+                    <div class="cdic-info">
+                        <div class="cdic-logo-placeholder"><img src="images/FSC.png" alt="FSC"></div>
+                        <span>存款人存保權益</span>
+                    </div>
+                    <div class="warning-text">謹慎理財&nbsp;&nbsp;&nbsp;信用至上</div>
+                </div>
+                <div class="footer-right">
+                    <p>服務專線：02-8979-6600</p>
+                    <p>台北市大安區敦化南路二段95號6樓</p>
+                    <div class="social-icons">
+			<a href="https://www.facebook.com/nextbanktaiwan" target="_blank" class="social-icon-placeholder"><img src="images/fb.png" alt="Facebook"></a>
+			<a href="https://www.instagram.com/nextbank.tw" target="_blank" class="social-icon-placeholder"><img src="images/ig.png" alt="Instagram"></a>
+			<a href="https://www.youtube.com/channel/UCnVfWhnUX_hQx8rG3uRO2gA" target="_blank" class="social-icon-placeholder"><img src="images/yt.png" alt="YouTube"></a>
+			<a href="https://www.linkedin.com/authwall?trk=bf&trkInfo=AQFkRfpCbfaCIAAAAZz6Uu6ongJoaiadcUt8xpS9kY8kJSfhtuQIBNlMBCSAbcqhrlIBmfK6LlOMOI_WOm3t4Kml0MHYATo2Vf9ny5KbJP3bdcu3VjSTVgx0b8npiKzri2kAqwU=&original_referer=&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2Fcompany%2Fnextbanktaiwan" target="_blank" class="social-icon-placeholder"><img src="images/in.png" alt="LinkedIn"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach((el) => {
+        observer.observe(el);
+    });
+
+/* 輪播圖的左右箭頭點擊功能 */
+    document.querySelectorAll('.carousel-container').forEach(container => {
+        const wrapper = container.querySelector('.carousel-wrapper');
+        const prevBtn = container.querySelector('.prev-arrow');
+        const nextBtn = container.querySelector('.next-arrow');
+
+        if (prevBtn && nextBtn && wrapper) {
+            nextBtn.addEventListener('click', () => {
+                const cardWidth = wrapper.querySelector('.card-vertical').clientWidth + 20; 
+                wrapper.scrollBy({ left: cardWidth, behavior: 'smooth' });
+            });
+
+            prevBtn.addEventListener('click', () => {
+                const cardWidth = wrapper.querySelector('.card-vertical').clientWidth + 20;
+                wrapper.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+            });
+        }
+    });
+
+</script>
+
+</body>
+</html>
